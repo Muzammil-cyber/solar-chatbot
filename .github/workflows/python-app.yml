@@ -1,0 +1,36 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+
+name: Python application feat/llm
+
+on:
+  push:
+    branches: ["feat/llm"]
+  pull_request:
+    branches: ["feat/llm"]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up model
+        run: |
+          mkdir -p models
+          curl -L -o models/phi2.gguf https://huggingface.co/TheBloke/phi-2-GGUF/resolve/main/phi-2.Q4_K_M.gguf
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - name: Running Test Script
+        run: |
+          python build_index.py
+          python test_chatbot.py
